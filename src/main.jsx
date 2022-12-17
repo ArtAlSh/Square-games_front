@@ -2,9 +2,12 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import {BrowserRouter} from "react-router-dom";
 import App from './App';
-// import reportWebVitals from './reportWebVitals';
 
 import './index.css';
+
+// import '@popperjs/core/dist/esm/popper';
+import 'bootstrap/dist/js/bootstrap.esm';
+import 'bootstrap/dist/js/bootstrap.esm.min';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/js/dist/dropdown';
 import 'bootstrap/js/dist/button';
@@ -15,5 +18,3 @@ root.render(
         <App />
       </BrowserRouter>
 );
-
-// reportWebVitals();
