@@ -30,34 +30,20 @@ class TicTacToeApp extends React.Component {
             winner: null,
         };
         this.counter = this.counter.bind(this);
-        // useEffect(
-        //     () => {
-        //         const interval = setInterval( () => {console.log("set interval")}, 1000 );
-        //         return clearInterval(interval);
-        //     }, []
-        // );
         window.setInterval(this.counter, 1000);
     }
 
     componentDidMount() {
         this.newGame();
     }
-    //
-    // useEffect(() => {
-    //     const interval = setInterval(() => {
-    //         console.log('This will be called every 2 seconds');
-    //     }, 2000);
-    //
-    //     return ( () => clearInterval() );
-    // }
 
     counter() {
         if (this.state.counter && !this.state.winner) {
             let counter = this.state.counter - 1;
-            console.log(this.state.counter);
+            console.log(counter);
             this.setState({counter: counter});
             this.updateGame();
-        } else {
+        } else if (!this.state.winner) {
             let msg = this.state.started ? "Time is over." : "Can't find an opponent :("
             this.setState({winner: msg});
         }
@@ -68,13 +54,7 @@ class TicTacToeApp extends React.Component {
             back_req.get(TIC_TAC_TOE_LINKS.base)
             .then( rez => {
                 if (rez.data.your_turn) {
-                    this.setState({
-                        started: rez.data.started,
-                        values: rez.data.play_square,
-                        your_turn: rez.data.your_turn,
-                        winner: rez.data.winner,
-                        counter: COUNTER,
-                    });
+                    this.setGameStates(rez);
                 }
             }
             ).catch( () => this.setState({winner: "Your opponent stopped the game."}) );
@@ -82,15 +62,9 @@ class TicTacToeApp extends React.Component {
             back_req(TIC_TAC_TOE_LINKS.base)
                 .then( rez => {
                     if (rez.data.started) {
-                        this.setState({
-                        started: rez.data.started,
-                        values: rez.data.play_square,
-                        your_turn: rez.data.your_turn,
-                        winner: rez.data.winner,
-                        counter: COUNTER,
-                    });
+                        this.setGameStates(rez);
                     }
-                } );
+                });
         }
     }
 
@@ -99,29 +73,26 @@ class TicTacToeApp extends React.Component {
         // back_req.delete(TIC_TAC_TOE_LINKS.base);
         // create new game
         back_req.post(TIC_TAC_TOE_LINKS.base)
-            .then( rez => {
-                this.setState({
-                    started: rez.data.started,
-                    values: rez.data.play_square,
-                    your_turn: rez.data.your_turn,
-                    winner: rez.data.winner,
-                    counter: COUNTER,
-                });
-            });
+            .then( rez => this.setGameStates(rez) );
     }
 
     setValue(cellNum) {
         if (!this.state.values[cellNum]) {
             let data = {"cell": cellNum}
             back_req.put(TIC_TAC_TOE_LINKS.base, data)
-                .then( rez => this.setState({
-                    started: rez.data.started,
-                    values: rez.data.play_square,
-                    your_turn: rez.data.your_turn,
-                    winner: rez.data.winner,
-                    counter: COUNTER,
-                })).catch();
+                .then( rez => this.setGameStates(rez) )
+                .catch();
         }
+    }
+
+    setGameStates(states) {
+        this.setState({
+            started: states.data.started,
+            values: states.data.play_square,
+            your_turn: states.data.your_turn,
+            winner: states.data.winner,
+            counter: COUNTER,
+        });
     }
 
     handleClick(cellNum) {
